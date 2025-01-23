@@ -39,7 +39,7 @@ def modPix(pix, data): # get lsb from pix and fill with data
         yield pix[3:6]
         yield pix[6:9]
 
-def encode_enc(newimg, data):
+def encodeEnc(newimg, data):
     w = newimg.size[0]
     (x, y) = (0, 0)
     for pixel in modPix(newimg.getdata(), data):
@@ -55,7 +55,7 @@ def encode(img_path, message, output_path):
     if (len(message) == 0):
         raise ValueError('Data is empty')
     newimg = image.copy()
-    encode_enc(newimg, message)
+    encodeEnc(newimg, message)
     newimg.save(output_path, str(output_path.split(".")[1].upper()))
 
 def decode(img_path):
@@ -74,22 +74,22 @@ def decode(img_path):
         if (pixels[-1] % 2 != 0):
             return data
 
-def browse_image():
+def browseImage():
     filename = filedialog.askopenfilename()
     return filename
 
-def save_image():
+def saveImage():
     filename = filedialog.asksaveasfilename(defaultextension=".png", filetypes=[("PNG files", "*.png"), ("All files", "*.*")])
     return filename
 
-def encode_gui(output_text):
-    img_path = browse_image()
+def encodeGui(output_text):
+    img_path = browseImage()
     if not img_path:
         return
     message = simpledialog.askstring("Input", "Enter the message to encode:")
     if not message:
         return
-    output_path = save_image()
+    output_path = saveImage()
     if not output_path:
         return
     try:
@@ -98,8 +98,8 @@ def encode_gui(output_text):
     except Exception as e:
         output_text.insert(END, f"Error: {str(e)}\n")
 
-def decode_gui(output_text):
-    img_path = browse_image()
+def decodeGui(output_text):
+    img_path = browseImage()
     if not img_path:
         return
     try:
@@ -118,10 +118,10 @@ def main():
     output_text = Text(root, height=10, width=50)
     output_text.pack(pady=10)
 
-    encode_button = Button(button_frame, text="Encode", command=lambda: encode_gui(output_text))
+    encode_button = Button(button_frame, text="Encode", command=lambda: encodeGui(output_text))
     encode_button.pack(side=LEFT, padx=5)
 
-    decode_button = Button(button_frame, text="Decode", command=lambda: decode_gui(output_text))
+    decode_button = Button(button_frame, text="Decode", command=lambda: decodeGui(output_text))
     decode_button.pack(side=LEFT, padx=5)
 
     root.mainloop()
