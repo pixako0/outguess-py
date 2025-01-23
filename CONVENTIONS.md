@@ -6,4 +6,3 @@
 - Indent code blocks with 4 spaces or 1 tab.
 - Add comments to explain complex logic.
 - Use single quotes for strings.
-- Avoid global variables.
