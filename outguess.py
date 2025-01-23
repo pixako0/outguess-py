@@ -6,13 +6,14 @@ def genData(data):
         newd.append(format(ord(i), '08b')) # 8bits
     return newd
 
-def modPix(pix, data):
+def modPix(pix, data): # get lsb from pix and fill with data
     datalist = genData(data)
     lendata = len(datalist)
     imdata = iter(pix)
 
     for i in range(lendata):
-        pix = [value for value in imdata.__next__()[:3] + imdata.__next__()[:3] + imdata.__next__()[:3]]
+        pix = [value for value in imdata.__next__()[:3] + imdata.__next__()[:3] + imdata.__next__()[:3]] # get 3 pixels
+        
         for j in range(0, 8):
             if (datalist[i][j] == '0' and pix[j]% 2 != 0):
                 pix[j] -= 1
