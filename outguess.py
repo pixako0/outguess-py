@@ -1,3 +1,6 @@
+from tkinter import *
+from tkinter import simpledialog
+from tkinter import filedialog, messagebox
 from PIL import Image
 
 def genData(data):
@@ -13,7 +16,7 @@ def modPix(pix, data): # get lsb from pix and fill with data
 
     for i in range(lendata):
         pix = [value for value in imdata.__next__()[:3] + imdata.__next__()[:3] + imdata.__next__()[:3]] # get 3 pixels
-        
+
         for j in range(0, 8):
             if (datalist[i][j] == '0' and pix[j]% 2 != 0):
                 pix[j] -= 1
@@ -47,20 +50,16 @@ def encode_enc(newimg, data):
         else:
             x += 1
 
-def encode():
-    img = input("Image> ")
-    image = Image.open(img, 'r')
-    data = input("Message> ")
-    if (len(data) == 0):
+def encode(img_path, message, output_path):
+    image = Image.open(img_path, 'r')
+    if (len(message) == 0):
         raise ValueError('Data is empty')
     newimg = image.copy()
-    encode_enc(newimg, data)
-    new_img_name = input("Output> ")
-    newimg.save(new_img_name, str(new_img_name.split(".")[1].upper()))
+    encode_enc(newimg, message)
+    newimg.save(output_path, str(output_path.split(".")[1].upper()))
 
-def decode():
-    img = input("Image> ")
-    image = Image.open(img, 'r')
+def decode(img_path):
+    image = Image.open(img_path, 'r')
     data = ''
     imgdata = iter(image.getdata())
     while (True):
@@ -75,14 +74,57 @@ def decode():
         if (pixels[-1] % 2 != 0):
             return data
 
-def menu():
-    a = int(input("== Outguess ==\n1. Encode\n2. Decode\nChoice> "))
-    if (a == 1):
-        encode()
- 
-    elif (a == 2):
-        print("Decoded message: " + decode())
-    else:
-        raise Exception("Enter correct input")
- 
-menu()
+def browse_image():
+    filename = filedialog.askopenfilename()
+    return filename
+
+def save_image():
+    filename = filedialog.asksaveasfilename(defaultextension=".png", filetypes=[("PNG files", "*.png"), ("All files", "*.*")])
+    return filename
+
+def encode_gui(output_text):
+    img_path = browse_image()
+    if not img_path:
+        return
+    message = simpledialog.askstring("Input", "Enter the message to encode:")
+    if not message:
+        return
+    output_path = save_image()
+    if not output_path:
+        return
+    try:
+        encode(img_path, message, output_path)
+        output_text.insert(END, "Message encoded and saved successfully!\n")
+    except Exception as e:
+        output_text.insert(END, f"Error: {str(e)}\n")
+
+def decode_gui(output_text):
+    img_path = browse_image()
+    if not img_path:
+        return
+    try:
+        message = decode(img_path)
+        output_text.insert(END, f"Decoded message: {message}\n")
+    except Exception as e:
+        output_text.insert(END, f"Error: {str(e)}\n")
+
+def main():
+    root = Tk()
+    root.title("Outguess Steganography")
+
+    button_frame = Frame(root)
+    button_frame.pack(pady=10)
+
+    output_text = Text(root, height=10, width=50)
+    output_text.pack(pady=10)
+
+    encode_button = Button(button_frame, text="Encode", command=lambda: encode_gui(output_text))
+    encode_button.pack(side=LEFT, padx=5)
+
+    decode_button = Button(button_frame, text="Decode", command=lambda: decode_gui(output_text))
+    decode_button.pack(side=LEFT, padx=5)
+
+    root.mainloop()
+
+if __name__ == "__main__":
+    main()
